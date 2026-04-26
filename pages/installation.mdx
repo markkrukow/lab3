@@ -1,0 +1,39 @@
+# Installation
+
+## 1. Python API
+
+```bash
+python -m venv .venv
+.venv\Scripts\activate
+python -m pip install -e .[dev]
+uvicorn app.main:app --reload
+```
+
+API will be available at `http://127.0.0.1:8000`.
+
+## 2. OpenAPI file
+
+Specification file:
+
+`openapi/social_network_api.yaml`
+
+## 3. Python SDK generation
+
+```bash
+python scripts/generate_sdk.py
+```
+
+Generated SDK directory:
+
+`sdk/social_network_client`
+
+## 4. Zudoku docs
+
+```bash
+npm install
+npm run dev
+```
+
+Docs site:
+
+`http://localhost:3000`

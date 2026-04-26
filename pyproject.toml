@@ -1,0 +1,23 @@
+[project]
+name = "social-network-openapi-lab"
+version = "0.1.0"
+description = "Lab project: OpenAPI + Python SDK + Zudoku docs"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.115.0",
+  "uvicorn>=0.30.0",
+  "pydantic>=2.9.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "openapi-python-client>=0.26.0",
+]
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["app"]

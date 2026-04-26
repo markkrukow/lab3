@@ -1,0 +1,14 @@
+{
+  "name": "social-network-zudoku-docs",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "zudoku dev",
+    "build": "zudoku build",
+    "preview": "zudoku preview"
+  },
+  "devDependencies": {
+    "zudoku": "^0.76.0",
+    "typescript": "^5.9.0"
+  }
+}

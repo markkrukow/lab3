@@ -1,0 +1,336 @@
+openapi: 3.0.3
+info:
+  title: Social Network API
+  version: 1.0.0
+  description: CRUD REST API for Users and Posts.
+servers:
+  - url: http://127.0.0.1:8000
+tags:
+  - name: Users
+  - name: Posts
+paths:
+  /users:
+    get:
+      tags: [Users]
+      summary: Get all users
+      responses:
+        "200":
+          description: Users list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+              examples:
+                sample:
+                  value:
+                    - id: 1
+                      username: mark_kr
+                      email: mark@example.com
+                      full_name: Mark Kriukov
+    post:
+      tags: [Users]
+      summary: Create user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserCreate"
+            examples:
+              sample:
+                value:
+                  username: mark_kr
+                  email: mark@example.com
+                  full_name: Mark Kriukov
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+  /users/{user_id}:
+    parameters:
+      - $ref: "#/components/parameters/UserId"
+    get:
+      tags: [Users]
+      summary: Get user by ID
+      responses:
+        "200":
+          description: User details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          $ref: "#/components/responses/NotFoundUser"
+    put:
+      tags: [Users]
+      summary: Update user by ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserUpdate"
+      responses:
+        "200":
+          description: User updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          $ref: "#/components/responses/NotFoundUser"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+    delete:
+      tags: [Users]
+      summary: Delete user by ID
+      responses:
+        "204":
+          description: User deleted
+        "404":
+          $ref: "#/components/responses/NotFoundUser"
+  /posts:
+    get:
+      tags: [Posts]
+      summary: Get all posts
+      parameters:
+        - name: user_id
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: Optional author filter.
+      responses:
+        "200":
+          description: Posts list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Post"
+    post:
+      tags: [Posts]
+      summary: Create post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostCreate"
+      responses:
+        "201":
+          description: Post created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        "404":
+          $ref: "#/components/responses/NotFoundUser"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+  /posts/{post_id}:
+    parameters:
+      - $ref: "#/components/parameters/PostId"
+    get:
+      tags: [Posts]
+      summary: Get post by ID
+      responses:
+        "200":
+          description: Post details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        "404":
+          $ref: "#/components/responses/NotFoundPost"
+    put:
+      tags: [Posts]
+      summary: Update post by ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostUpdate"
+      responses:
+        "200":
+          description: Post updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        "404":
+          description: Post or User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+              examples:
+                post_not_found:
+                  value:
+                    detail: Post not found
+                user_not_found:
+                  value:
+                    detail: Author user not found
+        "422":
+          $ref: "#/components/responses/ValidationError"
+    delete:
+      tags: [Posts]
+      summary: Delete post by ID
+      responses:
+        "204":
+          description: Post deleted
+        "404":
+          $ref: "#/components/responses/NotFoundPost"
+
+components:
+  parameters:
+    UserId:
+      name: user_id
+      in: path
+      required: true
+      schema:
+        type: integer
+    PostId:
+      name: post_id
+      in: path
+      required: true
+      schema:
+        type: integer
+
+  schemas:
+    User:
+      type: object
+      required: [id, username, email, full_name]
+      properties:
+        id:
+          type: integer
+          example: 1
+        username:
+          type: string
+          minLength: 3
+          maxLength: 30
+          example: mark_kr
+        email:
+          type: string
+          format: email
+          example: mark@example.com
+        full_name:
+          type: string
+          example: Mark Kriukov
+    UserCreate:
+      type: object
+      required: [username, email, full_name]
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 30
+        email:
+          type: string
+          format: email
+        full_name:
+          type: string
+    UserUpdate:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 30
+        email:
+          type: string
+          format: email
+        full_name:
+          type: string
+
+    Post:
+      type: object
+      required: [id, title, content, user_id]
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          minLength: 3
+          maxLength: 120
+          example: My first post
+        content:
+          type: string
+          example: Hello, social network!
+        user_id:
+          type: integer
+          example: 1
+    PostCreate:
+      type: object
+      required: [title, content, user_id]
+      properties:
+        title:
+          type: string
+          minLength: 3
+          maxLength: 120
+        content:
+          type: string
+        user_id:
+          type: integer
+    PostUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 3
+          maxLength: 120
+        content:
+          type: string
+        user_id:
+          type: integer
+
+    ErrorMessage:
+      type: object
+      required: [detail]
+      properties:
+        detail:
+          type: string
+          example: User not found
+    ValidationError:
+      type: object
+      required: [detail]
+      properties:
+        detail:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+
+  responses:
+    NotFoundUser:
+      description: User not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+          example:
+            detail: User not found
+    NotFoundPost:
+      description: Post not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorMessage"
+          example:
+            detail: Post not found
+    ValidationError:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ValidationError"
